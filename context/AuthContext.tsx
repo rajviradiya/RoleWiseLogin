@@ -10,6 +10,7 @@ interface Users {
     phone: string;
     roles: string;
 }
+
 interface AuthComps {
     phone: string;
     setPhone: (data: string) => void;
@@ -76,7 +77,7 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         const role = await userData[0]?.role
         if (role === "client") {
-            navigation.navigate("Home");
+            navigation.navigate("Client");
         } else if (role === "employee") {
             navigation.navigate("Employee");
         } else if (role === "admin") {
@@ -84,7 +85,6 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
             navigation.navigate("Login");
         }
-
         setcurrentauthUser(userData);
     };
 

@@ -4,15 +4,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD2XMoDOBioPVnty1QZogabqiNQMpLVFSI",
-  authDomain: "fir-auth-48dfc.firebaseapp.com",
-  projectId: "fir-auth-48dfc",
-  storageBucket: "fir-auth-48dfc.appspot.com",
-  messagingSenderId: "534380130586",
-  appId: "1:534380130586:web:5082e64bbcacd83a88fca3",
-  measurementId: "G-1SWH7MY55D"
+  apiKey: "AIzaSyDhIodW7iiBpOVbxcc8Mx_jFKaaA85IU58",
+  authDomain: "rolewiselogin.firebaseapp.com",
+  projectId: "rolewiselogin",
+  storageBucket: "rolewiselogin.appspot.com",
+  messagingSenderId: "205652015457",
+  appId: "1:205652015457:web:732f45f760f6c74cf12d20",
+  measurementId: "G-N2R99C15XM"
 };
-
 
 const app = initializeApp(firebaseConfig);
 

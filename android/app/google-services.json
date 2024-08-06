@@ -1,48 +1,47 @@
 {
   "project_info": {
-    "project_number": "534380130586",
-    "project_id": "fir-auth-48dfc",
-    "storage_bucket": "fir-auth-48dfc.appspot.com"
+    "project_number": "205652015457",
+    "project_id": "rolewiselogin",
+    "storage_bucket": "rolewiselogin.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:534380130586:android:3439b15c5b9b4b1a88fca3",
+        "mobilesdk_app_id": "1:205652015457:android:d8dca64e800c2a5ff12d20",
         "android_client_info": {
           "package_name": "com.raj1212.AuthDemo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "205652015457-an0s5kt78njifdl7rr4nb27b1jv18nlt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.raj1212.AuthDemo",
+            "certificate_hash": "062a9d8ac26ac49cc67aaf7589ac05077dd71617"
+          }
+        },
+        {
+          "client_id": "205652015457-81rsmae86n709dgem0ph9ilqer083gfj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyCiOos3hmdRgSKKHc2FfDQu48ikmR_2YkM"
+          "current_key": "AIzaSyBLkOge0BGYT-KBvEX2x1uhMSXJj02hsiw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:534380130586:android:2450c7a953a539f588fca3",
-        "android_client_info": {
-          "package_name": "com.raj1212.DemoAuth"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCiOos3hmdRgSKKHc2FfDQu48ikmR_2YkM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "205652015457-81rsmae86n709dgem0ph9ilqer083gfj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
   ],
   "configuration_version": "1"
-}
+} 

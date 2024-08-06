@@ -5,14 +5,20 @@ import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
 
-    const { loading, countrycode, phone, setPhone, signInWithPhoneNumber } = useAuthContext();
+    const { loading, countrycode, phone, setPhone, signInWithPhoneNumber, setLoading } = useAuthContext();
 
     const navigation = useNavigation();
 
     const handleLogin = async () => {
-        await signInWithPhoneNumber(countrycode, phone);
-        navigation.navigate("VerifyOtp");
-        setPhone("")
+        try {
+            await signInWithPhoneNumber(countrycode, phone);
+            navigation.navigate("VerifyOtp");
+            setPhone("")
+            setLoading(false)
+        } catch (error) {
+            console.log("Error:", error)
+            setLoading(false)
+        }
     };
 
     console.log(`${countrycode}${phone}`, "phone ");
@@ -21,7 +27,7 @@ const Login = () => {
             <Text style={styles.label}>Phone Number:</Text>
             <TextInput
                 style={styles.input}
-                keyboardType="phone-pad"
+                keyboardType="pho000ne-pad"
                 placeholder="Enter phone number"
                 value={phone}
                 onChangeText={(text) => setPhone(text)}

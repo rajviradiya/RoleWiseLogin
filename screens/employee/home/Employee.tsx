@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useAuthContext } from '../../context/AuthContext';
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useAuthContext } from '../../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 
-const Home = () => {
+const Employee = () => {
     const { signOut } = useAuthContext();
     const navigation = useNavigation();
 
@@ -14,7 +14,7 @@ const Home = () => {
     }
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
+            <Text>Employee</Text>
             <TouchableOpacity style={styles.button} onPress={() => handleLogout()}>
                 <Text>LogOut</Text>
             </TouchableOpacity>
@@ -22,7 +22,7 @@ const Home = () => {
     )
 }
 
-export default Home
+export default Employee
 
 const styles = StyleSheet.create({
     container: {

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { useAuthContext } from '../../context/AuthContext'
+import { useAuthContext } from '../../../context/AuthContext'
 import { useNavigation } from '@react-navigation/native'
 
 const Admin = () => {
