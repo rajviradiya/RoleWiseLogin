@@ -11,6 +11,7 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
+            setLoading(true)
             await signInWithPhoneNumber(countrycode, phone);
             navigation.navigate("VerifyOtp");
             setPhone("")

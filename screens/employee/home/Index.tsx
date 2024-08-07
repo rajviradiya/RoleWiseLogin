@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useAuthContext } from '../../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 
-const Employee = () => {
+const Index = () => {
     const { signOut } = useAuthContext();
     const navigation = useNavigation();
 
@@ -22,7 +22,7 @@ const Employee = () => {
     )
 }
 
-export default Employee
+export default Index
 
 const styles = StyleSheet.create({
     container: {

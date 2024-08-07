@@ -1,11 +1,13 @@
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Login from '../screens/auth/Login';
 import { createStackNavigator } from '@react-navigation/stack';
+import Login from '../screens/auth/Login';
 import VerifyOtp from '../screens/auth/VerifyOtp';
 import Admin from '../screens/admin/home/Admin';
-import Employee from '../screens/employee/home/Employee';
-import { Client } from '../screens/client/home/Client';
+import ClientNavigation from './ClientNavigation';
+import EmployeeNavigation from './EmployeeNavigation';
+import CreateInbox from '../screens/inbox/CreateInbox';
+import ShowInbox from '../screens/inbox/ShowInbox';
 
 const Stack = createStackNavigator();
 
@@ -14,9 +16,11 @@ const Main = () => {
         <Stack.Navigator>
             <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
             <Stack.Screen name='VerifyOtp' component={VerifyOtp} options={{ headerShown: false }} />
-            <Stack.Screen name='Client' component={Client} options={{ headerShown: false }} />
+            <Stack.Screen name='Client' component={ClientNavigation} options={{ headerShown: false }} />
+            <Stack.Screen name='Employee' component={EmployeeNavigation} options={{ headerShown: false }} />
             <Stack.Screen name='Admin' component={Admin} options={{ headerShown: false }} />
-            <Stack.Screen name='Employee' component={Employee} options={{ headerShown: false }} />
+            <Stack.Screen name='CreateInbox' component={CreateInbox} />
+            <Stack.Screen name='ShowInbox' component={ShowInbox} />
         </Stack.Navigator>
     )
 }

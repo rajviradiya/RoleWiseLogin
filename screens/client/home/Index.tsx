@@ -20,6 +20,7 @@ import {
 import FileLogo from "../../../assets/svg/fileLogo";
 import GoogleIcon from "../../../assets/svg/googleIcon";
 import MediaModal from "../../../components/Model";
+import { useAuthContext } from "../../../context/AuthContext";
 
 type Folder = {
   id: string;
@@ -37,7 +38,7 @@ type Content = {
   lastModifyingUserName: string;
 };
 
-export const Client: React.FC = () => {
+const Index: React.FC = () => {
   const [signedIn, setSignedIn] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [currentFolderName, setCurrentFolderName] = useState<string>("Folders");
@@ -52,6 +53,12 @@ export const Client: React.FC = () => {
   const [modalContent, setModalContent] = useState('');
 
   const navigation = useNavigation<NavigationProp<any>>();
+  const { signOut } = useAuthContext();
+
+  const handleLogout = () => {
+    signOut();
+    navigation.navigate("Login")
+  }
 
   useEffect(() => {
     fetchFolders("root");
@@ -282,9 +289,18 @@ export const Client: React.FC = () => {
           folderName={currentFolderName}
         />
       </View>
+
+      <View>
+        <Text>Employee</Text>
+        <TouchableOpacity style={styles.button} onPress={() => handleLogout()}>
+          <Text>LogOut</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
+
+export default Index;
 
 const styles = StyleSheet.create({
   googleBtnContainer: {
@@ -341,5 +357,13 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
     padding: 10,
     borderRadius: 10
+  },
+  button: {
+    borderWidth: 1,
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    padding: 10
   }
 });

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 import auth from '@react-native-firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../config';
 
@@ -27,8 +27,10 @@ interface AuthComps {
     signOut: () => void;
     loading: boolean,
     setLoading: (data: boolean) => void;
+    currentuserrole: string;
+    setCurrentUserRole: (data: string) => void;
 }
-const AuthContext = createContext<AuthComps | undefined>(undefined)
+const AuthContext = createContext<AuthComps | undefined>(undefined);
 
 const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [phone, setPhone] = useState<string>("");
@@ -37,15 +39,12 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [otp, setOtp] = useState<string>("");
     const [currentauthUser, setcurrentauthUser] = useState<any>("");
     const [loading, setLoading] = useState(false);
-
+    const [currentuserrole, setCurrentUserRole] = useState<string>("");
     const navigation = useNavigation();
 
-    console.log(confirmationcode, "user");
-
-
     useEffect(() => {
+        setLoading(true);
         (async () => {
-            setLoading(false);
             await auth().onAuthStateChanged(async (user) => {
                 if (user != null) {
                     console.log(user, "code ");
@@ -57,10 +56,8 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [])
 
     const signInWithPhoneNumber = async (code: string, phone: string) => {
-        setLoading(true)
         const result = await auth().signInWithPhoneNumber(`${code}${phone}`)
         setConfirmationCode(result);
-        setLoading(false)
     };
 
     const confirmOtp = async (code: string) => {
@@ -86,6 +83,7 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             navigation.navigate("Login");
         }
         setcurrentauthUser(userData);
+        setCurrentUserRole(userData[0]?.role)
     };
 
     const signOut = async () => {
@@ -97,6 +95,7 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             console.log(error);
         }
     }
+
     return (
         <AuthContext.Provider value={{
             phone,
@@ -113,7 +112,9 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setcurrentauthUser,
             signOut,
             loading,
-            setLoading
+            setLoading,
+            currentuserrole,
+            setCurrentUserRole,
         }}>
             {children}
         </AuthContext.Provider>
@@ -121,9 +122,6 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 }
 
 export default AuthContextProvider
-
-const styles = StyleSheet.create({})
-
 
 
 export const useAuthContext = () => {

@@ -15,6 +15,7 @@ const VerifyOtp = () => {
         await confirmOtp(otp)
         setConfirmationCode(null);
         setOtp("");
+        setLoading(false)
     }
 
     return (
