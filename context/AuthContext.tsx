@@ -29,6 +29,8 @@ interface AuthComps {
     setLoading: (data: boolean) => void;
     currentuserrole: string;
     setCurrentUserRole: (data: string) => void;
+    generateInitials: (data: string) => string;
+
 }
 const AuthContext = createContext<AuthComps | undefined>(undefined);
 
@@ -82,7 +84,9 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
             navigation.navigate("Login");
         }
-        setcurrentauthUser(userData);
+        const authUser = userData.find((item) => item);
+
+        setcurrentauthUser(authUser);
         setCurrentUserRole(userData[0]?.role)
     };
 
@@ -95,6 +99,18 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             console.log(error);
         }
     }
+
+    const generateInitials = (names: string) => {
+        const wordsFromName = names.split(' ');
+
+        const words = wordsFromName.filter(word => word.trim() !== '');
+
+        if (words.length > 1) {
+            return words.map(word => word.charAt(0)).join('').substring(0, 2).toUpperCase();
+        } else {
+            return (words[0] ? words[0].substring(0, 2) : '').toUpperCase();
+        }
+    };
 
     return (
         <AuthContext.Provider value={{
@@ -115,6 +131,7 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setLoading,
             currentuserrole,
             setCurrentUserRole,
+            generateInitials,
         }}>
             {children}
         </AuthContext.Provider>

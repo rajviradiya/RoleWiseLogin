@@ -29,8 +29,6 @@ const CreateInbox = () => {
         }
     };
 
-    console.log(title, Description, "title");
-
     const handelsubmmit = async () => {
         setLoading(true);
         if (image.length > 0) {

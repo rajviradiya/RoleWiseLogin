@@ -8,6 +8,8 @@ import ClientNavigation from './ClientNavigation';
 import EmployeeNavigation from './EmployeeNavigation';
 import CreateInbox from '../screens/inbox/CreateInbox';
 import ShowInbox from '../screens/inbox/ShowInbox';
+import AddThreadScreen from '../screens/Threads/AddThreadScreen';
+import ThreadDetails from '../screens/Threads/ThreadDetails';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +23,8 @@ const Main = () => {
             <Stack.Screen name='Admin' component={Admin} options={{ headerShown: false }} />
             <Stack.Screen name='CreateInbox' component={CreateInbox} />
             <Stack.Screen name='ShowInbox' component={ShowInbox} />
+            <Stack.Screen name='AddThread' component={AddThreadScreen} />
+            <Stack.Screen name='ThreadDetails' component={ThreadDetails} />
         </Stack.Navigator>
     )
 }

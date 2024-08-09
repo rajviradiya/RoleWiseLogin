@@ -25,9 +25,6 @@ const index = () => {
             Description: item?.Description,
         });
     }
-
-    console.log(currentuserrole, "cuser")
-
     return (
         <View style={styles.container}>
             {currentuserrole === "employee" ?

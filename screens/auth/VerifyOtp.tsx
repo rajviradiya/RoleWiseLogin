@@ -7,8 +7,6 @@ const VerifyOtp = () => {
     const { loading, otp, setLoading, setOtp, confirmOtp, currentauthUser, setConfirmationCode } = useAuthContext();
 
     const navigation = useNavigation();
-    // console.log(otp, currentauthUser[0]?.role, "otp")
-
 
     const handlVerifyOtp = async () => {
         setLoading(true);
