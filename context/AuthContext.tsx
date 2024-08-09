@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import React, { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react'
 import auth from '@react-native-firebase/auth';
-import { addDoc, collection, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../config';
+import { registerForPushNotificationsAsync } from '../components/Notificationfunc';
+import * as Notifications from "expo-notifications";
 
 interface Users {
     name: string;
@@ -42,7 +44,14 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [currentauthUser, setcurrentauthUser] = useState<any>("");
     const [loading, setLoading] = useState(false);
     const [currentuserrole, setCurrentUserRole] = useState<string>("");
+    const [expoPushToken, setExpoPushToken] = useState<string[]>([]);
+
     const navigation = useNavigation();
+
+    const notificationListener = useRef<Notifications.Subscription>();
+    const responseListener = useRef<Notifications.Subscription>();
+
+    console.log(expoPushToken,"token");
 
     useEffect(() => {
         setLoading(true);
@@ -51,11 +60,57 @@ const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (user != null) {
                     console.log(user, "code ");
                     await getuser(user?.phoneNumber);
+                    await generateFcmToken();
                 }
             })
             setLoading(false);
         })()
     }, [])
+
+    useEffect(() => {
+        console.log(expoPushToken, "token2")
+        if (expoPushToken && expoPushToken != undefined && expoPushToken.length > 0 && expoPushToken != null) {
+            updateProfileFCM(currentauthUser?.id, { fcmtoken: expoPushToken });
+        }
+    }, [expoPushToken])
+
+    const generateFcmToken = async() => {
+        try {
+            registerForPushNotificationsAsync()
+                .then(async (token: string | undefined) => {
+                    await setExpoPushToken(() => {
+                        if (currentauthUser?.fcmtoken || []?.indexOf(token) === -1) {
+                            return (currentauthUser?.fcmtoken || []) ? [...(currentauthUser?.fcmtoken || []), token] : [token]
+                        } else {
+                            return (currentauthUser?.fcmtoken || [])
+                        }
+                    })
+                })
+                .catch((error: any) => console.log(`${error}`))
+            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            });
+
+            return () => {
+                notificationListener.current &&
+                    Notifications.removeNotificationSubscription(notificationListener.current);
+                responseListener.current &&
+                    Notifications.removeNotificationSubscription(responseListener.current);
+            };
+        } catch (error) {
+            console.error('Error setting token:', error);
+        }
+    }
+
+    const updateProfileFCM = async (id: string, data: any) => {
+        try {
+            // setIsLoading(true)
+            await updateDoc(doc(db, "users", id), data);
+            console.log('Data updated successfully!');
+            // setIsLoading(false)
+        } catch (error) {
+            console.error('Error updating document in users:', error.message);
+        }
+    };
 
     const signInWithPhoneNumber = async (code: string, phone: string) => {
         const result = await auth().signInWithPhoneNumber(`${code}${phone}`)
