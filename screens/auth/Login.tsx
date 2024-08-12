@@ -1,13 +1,15 @@
 import { SafeAreaView, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useAuthContext } from '../../context/AuthContext'
 import { useNavigation } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
 const Login = () => {
 
     const { loading, countrycode, phone, setPhone, signInWithPhoneNumber, setLoading } = useAuthContext();
 
     const navigation = useNavigation();
+    const buttonRef = useRef(null);
 
     const handleLogin = async () => {
         try {
@@ -33,9 +35,16 @@ const Login = () => {
                 value={phone}
                 onChangeText={(text) => setPhone(text)}
             />
-            <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
-                <Text>{loading ? "Loading..." : "Login"}</Text>
-            </TouchableOpacity>
+                <Animatable.View ref={buttonRef} useNativeDriver>
+                <TouchableOpacity 
+                style={styles.button}
+                 onPress={() => handleLogin()}
+                 onPressIn={()=> buttonRef.current?.bounceIn(800)}
+                //  onPressOut={()=> buttonRef.current?.bounceOut(800)}
+                 >
+                    <Text>{loading ? "Loading..." : "Login"}</Text>
+                </TouchableOpacity>
+            </Animatable.View>
         </View>
     )
 }

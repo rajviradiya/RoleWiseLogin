@@ -80,8 +80,6 @@ interface AuthComps {
     updateMessagesData: (id: string | undefined, data: any) => Promise<void>;
     Notification: any;
     setNotification: (data: any) => void;
-    loadingdata: boolean;
-    setLoadingData: (data: boolean) => void;
     messagesData: Messages[];
     setMessagesData: (data: Messages[]) => void;
     users: Users[];
@@ -97,7 +95,6 @@ const DataContext = createContext<AuthComps | undefined>(undefined);
 const DataContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { currentauthUser } = useAuthContext();
     const [Notification, setNotification] = useState<any>([]);
-    const [loadingdata, setLoadingData] = useState<boolean>(true);
     const [messagesData, setMessagesData] = useState<Messages[]>([]);
     const [users, setUsers] = useState<Users[]>([]);
     const [clientData, setClientData] = useState<Client[]>([]);
@@ -184,6 +181,7 @@ const DataContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     ...doc.data(),
                 } as Notification));
                 setNotification(updatedMessagesData)
+                setIsLoadingListData(false);
                 console.log("Notification data get sucessfully")
             });
             return () => unsubscribeNotification();
@@ -204,6 +202,7 @@ const DataContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     createdAt: doc.data().createdAt ? (doc.data().createdAt as Timestamp).toDate() : new Date(),
                 }))
                 setMessagesData(updatedMessagesData);
+                setIsLoadingListData(false);
                 return () => unsubscribeMessages();
             })
         } catch (error) {
@@ -269,8 +268,6 @@ const DataContextProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             updateMessagesData,
             Notification,
             setNotification,
-            loadingdata,
-            setLoadingData,
             messagesData,
             setMessagesData,
             isLoadingListData,

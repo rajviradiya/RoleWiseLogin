@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Platform,
     StyleSheet,
@@ -91,6 +91,8 @@ const ModalScreen: React.FC<ModalScreenProps> = () => {
     const { uri, reading, uploadtos3, uploadProgress } = useS3Upload();
     const route = useRoute<RouteProp<{ params: { id: string } }>>();
     const { id, client, messages } = route.params;
+
+    const scrollViewRef = useRef(null);
 
     useEffect(() => {
         const filterclients = clientData?.filter((Item) => Item?.userId === currentauthUser?.id)
@@ -230,10 +232,21 @@ const ModalScreen: React.FC<ModalScreenProps> = () => {
         }
     };
 
+    const scrollToEnd = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({ animated: true });
+        }
+    };
+    
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor="white" />
-            <ScrollView>
+            <ScrollView
+            ref={scrollViewRef}
+            onContentSizeChange={() => {
+                scrollToEnd();
+            }}
+            >
                 <View style={styles.contentContainer}>
                     {threadData?.map((item) => {
                         // const isCurrentUserClient = (authuser?.roles[0] === "employee" ? (item.createdBy === client) : false);
@@ -563,7 +576,7 @@ const ModalScreen: React.FC<ModalScreenProps> = () => {
                 ) : (
                     <TouchableOpacity onPress={handleSend} disabled={loading}>
                         <View style={[styles.sendRound]}>
-                            <SendIcon/>
+                            <SendIcon />
                         </View>
                     </TouchableOpacity>
                 )}
@@ -710,7 +723,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 16,
         marginRight: 10,
-        borderWidth:2,
+        borderWidth: 2,
         backgroundColor: "white",
         color: "#8F969A",
         flexDirection: "row",

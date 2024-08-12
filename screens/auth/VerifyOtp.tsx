@@ -1,12 +1,14 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useAuthContext } from '../../context/AuthContext'
 import { useNavigation } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
 const VerifyOtp = () => {
     const { loading, otp, setLoading, setOtp, confirmOtp, currentauthUser, setConfirmationCode } = useAuthContext();
 
     const navigation = useNavigation();
+    const btnRef = useRef();
 
     const handlVerifyOtp = async () => {
         setLoading(true);
@@ -26,9 +28,15 @@ const VerifyOtp = () => {
                 value={otp}
                 onChangeText={(text) => setOtp(text)}
             />
-            <TouchableOpacity style={styles.button} onPress={() => handlVerifyOtp()}>
+            <Animatable.View  ref={btnRef} useNativeDriver>
+            <TouchableOpacity 
+            style={styles.button}
+             onPress={() => handlVerifyOtp()}
+             onPressIn={()=> btnRef.current.fadeIn()}
+             >
                 <Text>{loading ? "Loading..." : "Confirm"}</Text>
             </TouchableOpacity>
+            </Animatable.View>
         </View>
     )
 }

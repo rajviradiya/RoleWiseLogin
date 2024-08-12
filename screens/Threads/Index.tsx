@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, FlatList, Alert, Platform, StatusBar, TouchableOpacity, TextInput, Button, View, Text, ActivityIndicator } from 'react-native';
 // import { Text, View } from '../../components/Themed';
 // import { useGlobalContext } from '../../contexts/globalDataContext';
@@ -12,6 +12,9 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useDataContext } from '../../context/DataContext';
 // import { ActivityIndicator } from 'react-native-paper';
 // import { useTimer } from '../../contexts/TimerContext';
+import * as Animatable from 'react-native-animatable';
+import FlatListSkeleton from '../../components/FlatListSkeleton';
+
 interface Client {
     id: string;
     address: string;
@@ -66,13 +69,13 @@ const TabTwoScreen: React.FC = () => {
     >([]);
     // const { address } = useTimer();
     const { generateInitials, currentauthUser, currentuserrole } = useAuthContext();
-    const { getNotification, getMessage, getUsers, getClientData, getThreadsData, users, clientData, threadData } = useDataContext();
+    const { getNotification, getMessage, getUsers, getClientData, getThreadsData, users, clientData, threadData, isLoadingListData, setIsLoadingListData } = useDataContext();
 
     const navigation = useNavigation<NavigationProp<any>>();
     const [threadMessages, setThreadMessages] = useState<Messages[]>([]);
     const [notificationCounts, setNotificationCounts] = useState<NotificationCount[]>([]);
     const [threadClientMap, setThreadClientMap] = useState<{ [clientId: string]: Client[] }>({})
-    const [loading, setloading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     const [state, setState] = useState<AppState>({
         data: [],
@@ -80,21 +83,18 @@ const TabTwoScreen: React.FC = () => {
         searchQuery: "",
     });
 
+    const animationRefs = useRef([]);
+    const createThreadRef = useRef(null);
+
     useEffect(() => {
-        (async () => {
-            try {
-                // setIsLoadingListData(true);
-                getUsers();
-                getClientData();
-                getThreadsData();
-                // getGroups();
-                getMessage();
-                setloading(false);
-            } catch {
-                console.log("Threads Data Not get")
-            }
-        })();
+        getUsers();
+        getClientData();
+        getThreadsData();
+        getMessage();
+        setLoading(false)
     }, []);
+
+    console.log(loading, "loading");
 
     const filterUsersByRole = useCallback(() => {
         if (currentauthUser?.roles?.length > 0 && users?.length > 0) {
@@ -260,16 +260,8 @@ const TabTwoScreen: React.FC = () => {
         });
     };
 
-    const handleNavigation = () => {
-        if (currentuserrole == "client") {
-            navigation.navigate("CustomerProfile")
-        } else {
-            navigation.navigate("EmployeProfile")
-        }
-    }
-
     return (
-        <SafeAreaView style={{ flex: 1,backgroundColor:"white" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             {/* <StatusBar barStyle="light-content" backgroundColor="#0b141b" /> */}
             <View style={styles.container}>
 
@@ -291,14 +283,11 @@ const TabTwoScreen: React.FC = () => {
                 </View>
 
                 {loading ? (
-                    <View style={styles.loading}>
-                        <ActivityIndicator
-                            size="small"
-                            color="#4BD659"
-                            style={{ margin: "auto" }}
-                        />
-                    </View>
-
+                    <>
+                        <FlatListSkeleton />
+                        <FlatListSkeleton />
+                        <FlatListSkeleton />
+                    </>
                 ) : (<>
                     <FlatList
                         showsVerticalScrollIndicator={false}
@@ -307,73 +296,86 @@ const TabTwoScreen: React.FC = () => {
                                 ? state.filteredData
                                 : threadData
                         }
-                        renderItem={({ item }) => (
-
-                            <TouchableOpacity
-                                onPress={() => handleViewDetails(item)}
-                                style={styles.threadContainer}
+                        renderItem={({ item, index }) => (
+                            <Animatable.View
+                                animation="fadeInDownBig"
+                                duration={300}
+                                delay={index * 300}
+                                useNativeDriver
                             >
-                                <View style={styles.profileLogo}>
-                                    <Text style={styles.profileLogoText}>
-                                        {generateInitials(item.message)}
-                                    </Text>
-                                </View>
-                                <View style={styles.rightPart}>
-                                    <View style={{ flexDirection: "column", backgroundColor: "transparent" }}>
-                                        <Text style={styles.threadText}>{item?.message.trim()}</Text>
-                                        <View style={{ flexDirection: "column", backgroundColor: "transparent", justifyContent: "space-between" }}>
-                                            {
-                                                clientData?.some(client => client.userId === item?.createdBy.split("/")[2]) ?
-                                                    users?.filter(user => clientData.find((f) => f.id === item?.createdBy.split("/")[2])?.userId === user.id)
-                                                        ?.map(client => (
-                                                            <>
-                                                                <Text style={{
-                                                                    color: "lightgray",
-                                                                    marginHorizontal: 16,
-                                                                    fontSize: 12,
-                                                                }}>{client?.name}</Text>
-                                                                {/* <Text style={{
+                                <Animatable.View
+                                    ref={ref => animationRefs.current[index] = ref}
+                                    duration={200}
+                                    useNativeDriver
+                                >
+                                    <TouchableOpacity
+                                        onPress={() => handleViewDetails(item)}
+                                        onPressIn={() => animationRefs.current[index]?.bounceIn()}
+                                        style={styles.threadContainer}
+                                    >
+                                        <View style={styles.profileLogo}>
+                                            <Text style={styles.profileLogoText}>
+                                                {generateInitials(item.message)}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.rightPart}>
+                                            <View style={{ flexDirection: "column", backgroundColor: "transparent" }}>
+                                                <Text style={styles.threadText}>{item?.message.trim()}</Text>
+                                                <View style={{ flexDirection: "column", backgroundColor: "transparent", justifyContent: "space-between" }}>
+                                                    {
+                                                        clientData?.some(client => client.userId === item?.createdBy.split("/")[2]) ?
+                                                            users?.filter(user => clientData.find((f) => f.id === item?.createdBy.split("/")[2])?.userId === user.id)
+                                                                ?.map(client => (
+                                                                    <>
+                                                                        <Text style={{
+                                                                            color: "lightgray",
+                                                                            marginHorizontal: 16,
+                                                                            fontSize: 12,
+                                                                        }}>{client?.name}</Text>
+                                                                        {/* <Text style={{
                                                                     color: "lightgray",
                                                                     marginHorizontal: 16,
                                                                     fontSize: 12,
                                                                 }}>{address.split(",").slice(0, 2).join(",")}</Text> */}
-                                                            </>
-                                                        ))
-                                                    :
-                                                    users.filter(user => user.id === item?.createdBy.split("/")[2]).map(user => (
-                                                        <>
-                                                            <Text style={{
-                                                                color: "lightgray",
-                                                                marginHorizontal: 16,
-                                                                fontSize: 12,
-                                                            }}>{user?.name}</Text>
-                                                            {/* <Text style={{
+                                                                    </>
+                                                                ))
+                                                            :
+                                                            users.filter(user => user.id === item?.createdBy.split("/")[2]).map(user => (
+                                                                <>
+                                                                    <Text style={{
+                                                                        color: "lightgray",
+                                                                        marginHorizontal: 16,
+                                                                        fontSize: 12,
+                                                                    }}>{user?.name}</Text>
+                                                                    {/* <Text style={{
                                                                 color: "lightgray",
                                                                 marginHorizontal: 16,
                                                                 fontSize: 12,
                                                             }}>{address.split(",").slice(0, 2).join(",")}</Text> */}
-                                                        </>
-                                                    ))
-                                            }
-                                        </View>
-                                    </View>
-                                    <View style={styles.timerpart}>
-                                        <Text style={styles.timerStyle}>{new Date(item?.createdAt)?.toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</Text>
-                                        {/* notification */}
-
-                                        <View style={styles.notificationContainer}>
-                                            {notificationCounts?.find(nc => nc?.thread === `/threads/${item?.id}` && nc.userId === filteredUsers[0]?.id)?.count > 0 && (
-                                                <View style={styles.notification}>
-                                                    <Text style={styles.notificationText}>
-                                                        {notificationCounts?.find(nc => nc?.thread === `/threads/${item?.id}` && nc.userId === filteredUsers[0]?.id)?.count}
-                                                    </Text>
+                                                                </>
+                                                            ))
+                                                    }
                                                 </View>
-                                            )}
-                                            {/* <Button title="Delete" onPress={() => handleDelete(item)}></Button> */}
+                                            </View>
+                                            <View style={styles.timerpart}>
+                                                <Text style={styles.timerStyle}>{new Date(item?.createdAt)?.toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</Text>
+                                                {/* notification */}
+
+                                                <View style={styles.notificationContainer}>
+                                                    {notificationCounts?.find(nc => nc?.thread === `/threads/${item?.id}` && nc.userId === filteredUsers[0]?.id)?.count > 0 && (
+                                                        <View style={styles.notification}>
+                                                            <Text style={styles.notificationText}>
+                                                                {notificationCounts?.find(nc => nc?.thread === `/threads/${item?.id}` && nc.userId === filteredUsers[0]?.id)?.count}
+                                                            </Text>
+                                                        </View>
+                                                    )}
+                                                    {/* <Button title="Delete" onPress={() => handleDelete(item)}></Button> */}
+                                                </View>
+                                            </View>
                                         </View>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
+                                    </TouchableOpacity>
+                                </Animatable.View>
+                            </Animatable.View>
                         )}
                         keyExtractor={(item) => item.id}
                     />
@@ -381,14 +383,20 @@ const TabTwoScreen: React.FC = () => {
 
                 {/* <Button title='Delete' onPress={handleDeleteUser}></Button> */}
 
-                {currentuserrole == "client" && (<View style={styles.addThread}>
-                    <Link to={{ screen: "AddThread" }}>
-                        <View style={styles.addIcon}>
-                            <MessageIcon />
+                {currentuserrole == "client" && (
+                    <Animatable.View ref={createThreadRef} useNativeDriver>
+                        <View style={styles.addThread}>
+                            <TouchableOpacity
+                                onPress={()=> navigation.navigate("AddThread")}
+                                onPressIn={() => createThreadRef.current.fadeIn()}
+                            >
+                                <View style={styles.addIcon}>
+                                    <MessageIcon />
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                    </Link>
-
-                </View>)}
+                    </Animatable.View>
+                )}
             </View>
         </SafeAreaView >
     );
@@ -430,8 +438,8 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         flexDirection: "row",
         alignItems: "center",
-        borderWidth:2,
-        borderRadius:25
+        borderWidth: 2,
+        borderRadius: 25
     },
     threadText: {
         color: "black",
@@ -492,7 +500,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         backgroundColor: "#0b141b",
         position: "absolute",
-        bottom: 40,
+        bottom: 100,
         right: 16,
         elevation: 50,
         width: 52,

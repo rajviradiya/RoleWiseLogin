@@ -1,16 +1,20 @@
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 import { useAuthContext } from '../../context/AuthContext'
 import { useDataContext } from '../../context/DataContext'
+import FlatListSkeleton from '../../components/FlatListSkeleton'
+import * as Animatable from 'react-native-animatable';
 
-const index = () => {
+const Index = () => {
     const { currentuserrole } = useAuthContext();
-    const { getNotification, Notification, setNotification } = useDataContext();
+    const { getNotification, Notification, setNotification, isLoadingListData, setIsLoadingListData } = useDataContext();
     const navigation = useNavigation();
+    const ListvalRef = useRef([]);
 
     useEffect(() => {
+        setIsLoadingListData(true)
         getNotification();
     }, [])
 
@@ -35,16 +39,35 @@ const index = () => {
                 null
             }
             <ScrollView style={{ width: "100%" }}>
-                {
+                {isLoadingListData ? (
+                    <>
+                        <FlatListSkeleton />
+                        <FlatListSkeleton />
+                        <FlatListSkeleton />
+                    </>)
+                    :
                     Notification && Notification?.map((item, index) => (
-                        <TouchableOpacity key={index} style={styles.card} onPress={() => handleonCardClick(item)}>
-                            <View style={styles.tname}>
-                                <Text>T</Text>
-                            </View>
-                            <View style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Text style={{ fontSize: 18, fontWeight: 700 }}>{item?.title}</Text>
-                            </View>
-                        </TouchableOpacity>
+                        <Animatable.View 
+                        animation="fadeInDownBig"
+                        useNativeDriver
+                        duration={1000}
+                        key={index}
+                        >
+                            <Animatable.View ref={(ref) => ListvalRef.current[index] = ref} useNativeDriver>
+                                <TouchableOpacity
+                                    style={styles.card}
+                                    onPress={() => handleonCardClick(item)}
+                                    onPressIn={() => ListvalRef.current[index]?.zoomIn()}
+                                >
+                                    <View style={styles.tname}>
+                                        <Text>T</Text>
+                                    </View>
+                                    <View style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <Text style={{ fontSize: 18, fontWeight: 700 }}>{item?.title}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animatable.View>
+                        </Animatable.View>
                     ))
                 }
             </ScrollView>
@@ -52,7 +75,7 @@ const index = () => {
     )
 }
 
-export default index
+export default Index
 
 const styles = StyleSheet.create({
     container: {

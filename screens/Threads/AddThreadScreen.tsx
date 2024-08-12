@@ -41,6 +41,7 @@ interface NewData {
     customerId: string;
     creatorname: any;
 }
+import * as Animatable from 'react-native-animatable';
 
 export default function AddThreadScreen() {
     // const { clientData, getClientData, addData, getUsers, users, authuser } = useGlobalContext();
@@ -63,9 +64,13 @@ export default function AddThreadScreen() {
     const [filesUploadedCount, setFilesUploadedCount] = useState(0);
     const [totalFilesCount, setTotalFilesCount] = useState(0);
     const { uri, reading, uploadtos3, uploadProgress } = useS3Upload();
+ 
     const floatingLabelAnimation = useRef(
         new Animated.Value(text ? 1 : 0)
     ).current;
+
+    const submmitBtnRef = useRef(null);
+    const caerabtnRef = useRef(null);
 
     useEffect(() => {
         getClientData();
@@ -210,28 +215,6 @@ export default function AddThreadScreen() {
                 }
             }
 
-            // allToken?.map((item) => {
-            //     item?.map(async (token) => {
-            //         console.log(token, "tokenget")
-            //         await sendPushNotification(token)
-            //     });
-            // });
-
-
-            // if (userRole === "employee") {
-            //   users?.map(async (item) => {
-            //     if (item?.id == selectedUser) {
-            //       item?.fcmtoken?.map(async (token) => {
-            //         await sendPushNotification(token)
-            //       })
-            //     }
-            //   });
-            // }
-
-            // const cUser = users.find((item2) => {
-            //     return item2?.id === authuser?.id
-            // })?.name
-
             const active = true;
             const attachments = uploadedFiles;
             const client = id ? `/clients/${currentauthUser?.id}` : `/users/${currentauthUser?.id}`;
@@ -320,17 +303,19 @@ export default function AddThreadScreen() {
                     <Text style={styles.uploadText}>Upload Images</Text>
                 </View>
 
-                <View style={styles.imageContainer}>
-                    <TouchableOpacity
-                        style={styles.cameraView}
-                        onPress={handleSelectFiles}
-                    >
-                        <CameraImage />
-                    </TouchableOpacity>
+                <Animatable.View ref={caerabtnRef} useNativeDriver>
+                    <View style={styles.imageContainer}>
+                        <TouchableOpacity
+                            style={styles.cameraView}
+                            onPress={handleSelectFiles}
+                            onPressIn={()=> caerabtnRef.current.bounceIn()}
+                        >
+                            <CameraImage />
+                        </TouchableOpacity>
 
-                    {selectedFiles?.map(renderFile)}
-                </View>
-
+                        {selectedFiles?.map(renderFile)}
+                    </View>
+                </Animatable.View>
 
                 {loading ? (
                     <View style={{ flexDirection: "row" }}>
@@ -353,9 +338,15 @@ export default function AddThreadScreen() {
 
                     </View>
                 ) : (
-                    <TouchableOpacity style={styles.signUpButton} onPress={handleUploadNow}>
-                        <Text style={styles.buttonText}>Submit</Text>
-                    </TouchableOpacity>
+                    <Animatable.View ref={submmitBtnRef} useNativeDriver>
+                        <TouchableOpacity 
+                        style={styles.signUpButton}
+                         onPress={handleUploadNow}
+                         onPressIn={()=> submmitBtnRef.current.bounceIn()}
+                         >
+                            <Text style={styles.buttonText}>Submit</Text>
+                        </TouchableOpacity>
+                    </Animatable.View>
                 )}
             </ScrollView>
         </View>

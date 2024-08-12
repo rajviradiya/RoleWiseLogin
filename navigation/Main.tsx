@@ -10,12 +10,35 @@ import CreateInbox from '../screens/inbox/CreateInbox';
 import ShowInbox from '../screens/inbox/ShowInbox';
 import AddThreadScreen from '../screens/Threads/AddThreadScreen';
 import ThreadDetails from '../screens/Threads/ThreadDetails';
+import * as Animatable from 'react-native-animatable';
 
 const Stack = createStackNavigator();
 
 const Main = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+        screenOptions={{
+            // Define custom transitions here
+            transitionSpec: {
+              open: { animation:'spring', config: { duration: 300 } },
+              close: { animation: 'timing', config: { duration: 300 } },
+            },
+            cardStyleInterpolator: ({ current, layouts }) => {
+              return {
+                cardStyle: {
+                  transform: [
+                    {
+                      translateX: current.progress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [layouts.screen.width, 0],
+                      }),
+                    },
+                  ],
+                },
+              };
+            },
+          }}
+          >
             <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
             <Stack.Screen name='VerifyOtp' component={VerifyOtp} options={{ headerShown: false }} />
             <Stack.Screen name='Client' component={ClientNavigation} options={{ headerShown: false }} />

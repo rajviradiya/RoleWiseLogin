@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import FileLogo from "../../../assets/svg/fileLogo";
 import GoogleIcon from "../../../assets/svg/googleIcon";
 import MediaModal from "../../../components/Model";
 import { useAuthContext } from "../../../context/AuthContext";
+import * as Animatable from 'react-native-animatable';
 
 type Folder = {
   id: string;
@@ -54,6 +55,9 @@ const Index: React.FC = () => {
 
   const navigation = useNavigation<NavigationProp<any>>();
   const { signOut } = useAuthContext();
+
+  const googlebtnRef = useRef(null);
+  const logoutbtnRef = useRef(null);
 
   const handleLogout = () => {
     signOut();
@@ -269,14 +273,24 @@ const Index: React.FC = () => {
         </ View>
       ) : (
         <View style={styles.googleBtnContainer}>
-          <TouchableOpacity onPress={handleSignIn} style={styles.googleBtn}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View style={styles.googleIcon}>
-                <GoogleIcon />
+          <Animatable.View
+            ref={googlebtnRef}
+            useNativeDriver
+            duration={1000}
+          >
+            <TouchableOpacity
+              onPress={handleSignIn}
+              style={styles.googleBtn}
+              onPressIn={() => googlebtnRef.current.bounce()}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={styles.googleIcon}>
+                  <GoogleIcon />
+                </View>
+                <Text style={styles.googleText}>Sign in with Google</Text>
               </View>
-              <Text style={styles.googleText}>Sign in with Google</Text>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </Animatable.View>
         </View>
       )}
 
@@ -292,9 +306,20 @@ const Index: React.FC = () => {
 
       <View>
         <Text>Employee</Text>
-        <TouchableOpacity style={styles.button} onPress={() => handleLogout()}>
-          <Text>LogOut</Text>
-        </TouchableOpacity>
+        <Animatable.View
+          ref={logoutbtnRef}
+          useNativeDriver
+          animation="bounceIn" // Animation type when the component appears
+          duration={800} // Animation duration
+        >
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleLogout()}
+            onPressIn={() => logoutbtnRef.current.pulse()}
+          >
+            <Text>LogOut</Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </View>
     </SafeAreaView>
   );
@@ -364,6 +389,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
-    padding: 10
+    padding: 10,
+    margin: 15
   }
 });
